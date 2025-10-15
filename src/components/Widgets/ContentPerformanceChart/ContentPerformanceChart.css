@@ -1,8 +1,5 @@
-.content-performance-chart {
-  height: 300px;
-  width: 100%;
-  position: relative;
-}
+.content-performance-chart { height: 300px; width: 100%; position: relative; }
+.content-performance-chart canvas { background: transparent; }
 
 @media (max-width: 768px) {
   .content-performance-chart {

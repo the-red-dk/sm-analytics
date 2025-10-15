@@ -3,7 +3,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background-color: #f9fafb;
+  background-color: var(--bg);
 }
 
 .app-body {
@@ -16,7 +16,7 @@
   flex: 1;
   margin-left: 250px; /* Sidebar width */
   padding: 0;
-  background-color: #f9fafb;
+  background-color: var(--bg);
   transition: margin-left 0.3s ease;
   overflow-y: auto;
   min-height: calc(100vh - 64px);
@@ -45,7 +45,7 @@
   align-items: center;
   justify-content: center;
   min-height: 200px;
-  color: #6b7280;
+  color: var(--muted);
 }
 
 /* Error states */
@@ -55,7 +55,7 @@
   align-items: center;
   justify-content: center;
   min-height: 200px;
-  color: #dc2626;
+  color: var(--danger);
   text-align: center;
 }
 
@@ -69,16 +69,17 @@
 
 /* Card Styles */
 .card {
-  background: #ffffff;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
   padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.2s;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s, transform 0.2s;
 }
 
 .card:hover {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
 }
 
 .card-header {
@@ -88,15 +89,23 @@
 .card-title {
   font-size: 18px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
   margin: 0 0 4px 0;
 }
 
 .card-subtitle {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--muted);
   margin: 0;
 }
+
+/* Spinner */
+.loading-spinner { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.spinner {
+  width: 28px; height: 28px; border: 3px solid var(--surface-2); border-top-color: var(--accent);
+  border-radius: 50%; animation: spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 
 /* Animation Classes */
 @keyframes fadeIn {

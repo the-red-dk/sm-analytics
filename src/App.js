@@ -3,6 +3,9 @@ import './App.css';
 import Header from './components/Header/Header';
 import Sidebar from './components/Sidebar/Sidebar';
 import Dashboard from './components/Dashboard/Dashboard';
+import UserManagement from './components/UserManagement/UserManagement';
+import PostManagement from './components/PostManagement/PostManagement';
+import FollowerActivity from './components/FollowerActivity/FollowerActivity';
 
 function App() {
   const [activeModule, setActiveModule] = useState('dashboard');
@@ -17,11 +20,11 @@ function App() {
       case 'dashboard':
         return <Dashboard />;
       case 'users':
-        return <div className="placeholder-content">User Management - Coming Soon</div>;
+        return <UserManagement />;
       case 'posts':
-        return <div className="placeholder-content">Post Management - Coming Soon</div>;
+        return <PostManagement />;
       case 'followers':
-        return <div className="placeholder-content">Follower Activity - Coming Soon</div>;
+        return <FollowerActivity />;
       default:
         return <Dashboard />;
     }

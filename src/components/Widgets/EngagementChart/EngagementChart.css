@@ -1,8 +1,5 @@
-.engagement-chart {
-  height: 300px;
-  width: 100%;
-  position: relative;
-}
+.engagement-chart { height: 300px; width: 100%; position: relative; }
+.engagement-chart canvas { background: transparent; }
 
 @media (max-width: 768px) {
   .engagement-chart {

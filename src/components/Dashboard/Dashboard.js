@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Dashboard.css';
 import { mockData } from '../../mockData';
+import { AnalyticsApi } from '../../api';
 import KeyMetricsCards from '../Widgets/KeyMetricsCards/KeyMetricsCards';
 import EngagementChart from '../Widgets/EngagementChart/EngagementChart';
 import ContentPerformanceChart from '../Widgets/ContentPerformanceChart/ContentPerformanceChart';
@@ -12,15 +13,67 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate loading data from API
-    const loadData = () => {
-      setTimeout(() => {
-        setData(mockData);
-        setLoading(false);
-      }, 500);
-    };
+    const load = async () => {
+      try {
+        const [summary, engagement, contentPerf, userGrowth] = await Promise.all([
+          AnalyticsApi.getSummary(),
+          AnalyticsApi.getEngagement(),
+          AnalyticsApi.getContentPerformance(),
+          AnalyticsApi.getUserGrowth(),
+        ]);
 
-    loadData();
+        const keyMetrics = {
+          totalUsers: summary.totals.totalUsers,
+          totalPosts: summary.totals.totalPosts,
+          totalLikes: summary.totals.totalLikes,
+          engagementRate: summary.totals.engagementRate,
+        };
+
+        const weeklyEngagement = {
+          thisWeek: { likes: summary.weeklyEngagement.thisWeek.likesAndComments, comments: 0, shares: 0 },
+          lastWeek: { likes: summary.weeklyEngagement.lastWeek.likesAndComments, comments: 0, shares: 0 },
+        };
+
+        const dailyEngagement = engagement.map((e) => ({
+          date: e.date,
+          likes: Number(e.likes) || 0,
+          comments: Number(e.comments) || 0,
+          shares: 0,
+        }));
+
+        const topPosts = contentPerf.map((p) => ({
+          id: p.post_id,
+          title: (p.content || '').slice(0, 30) || `Post #${p.post_id}`,
+          likes: Number(p.likes) || 0,
+          comments: Number(p.comments) || 0,
+          shares: 0,
+          author: p.username,
+          date: '',
+        }));
+
+        let totalUsers = 0;
+        const userGrowthData = userGrowth.map((u, idx) => {
+          const newUsers = Number(u.new_users) || 0;
+          totalUsers = idx === 0 ? newUsers : totalUsers + newUsers;
+          return { date: u.date, newUsers, totalUsers };
+        });
+
+        setData({
+          keyMetrics,
+          weeklyEngagement,
+          dailyEngagement,
+          topPosts,
+          userGrowth: userGrowthData,
+          recentActivities: mockData.recentActivities, // keep mock for now
+        });
+      } catch (err) {
+        console.warn('Falling back to mockData due to API error:', err.message);
+        setData(mockData);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
   }, []);
 
   if (loading) {
