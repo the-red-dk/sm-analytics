@@ -7,13 +7,49 @@ Node.js (Express) + MySQL backend for the Social Media Analytics Dashboard.
 - MySQL 8.0+
 
 ## Setup
-1. Create database and sample data using the SQL script:
-   - Open MySQL Workbench and run `../database/schema.sql` (relative to this folder).
-2. Copy `.env.example` to `.env` and set DB credentials and JWT secret.
-3. Install dependencies:
-   - npm install
+
+### Quick Setup (Automated)
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Run the database seeding script:
+   ```bash
+   node seed.js
+   ```
+   The script will automatically:
+   - Connect to MySQL (localhost:3306 by default)
+   - Create the `sm_analytics` database
+   - Create all tables with proper schema
+   - Apply schema updates
+   - Insert sample data
+
+3. Copy `.env.example` to `.env` and configure if needed
 4. Start the server:
-   - npm run dev
+   ```bash
+   npm run dev
+   ```
+
+### Manual Setup
+1. Create database and sample data using the SQL scripts:
+   - Open MySQL Workbench and run `../database/schema.sql`
+   - Then run `../database/update_schema.sql`
+2. Copy `.env.example` to `.env` and set DB credentials and JWT secret
+3. Install dependencies:
+   ```bash
+   npm install
+   ```
+4. Start the server:
+   ```bash
+   npm run dev
+   ```
+
+### Environment Variables
+Set these environment variables before running `seed.js` if needed:
+- `DB_HOST` (default: localhost)
+- `DB_PORT` (default: 3306)
+- `DB_USER` (default: root)
+- `DB_PASSWORD` (default: empty string)
 
 The API runs at http://localhost:4000 by default.
 

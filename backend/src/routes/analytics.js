@@ -4,7 +4,6 @@ const { getPool } = require('../utils/db');
 
 const router = express.Router();
 
-// Summary: totals and simple weekly comparison
 router.get('/summary', auth(false), async (req, res, next) => {
   try {
     const pool = getPool();
@@ -13,7 +12,6 @@ router.get('/summary', auth(false), async (req, res, next) => {
     const [[{ total_likes }]] = await pool.query('SELECT COUNT(*) AS total_likes FROM likes');
     const [[{ total_comments }]] = await pool.query('SELECT COUNT(*) AS total_comments FROM comments');
 
-    // last 7 days vs previous 7 days engagement (likes + comments)
     const [[{ this_week }]] = await pool.query(
       `SELECT COALESCE(SUM(c),0) AS this_week FROM (
          SELECT COUNT(*) c FROM likes WHERE created_at >= (CURRENT_DATE - INTERVAL 6 DAY)
@@ -29,7 +27,6 @@ router.get('/summary', auth(false), async (req, res, next) => {
        ) t`
     );
 
-    // simple engagement rate approximation: (likes+comments)/posts (avoid division by zero)
     const engagementRate = total_posts ? (((total_likes + total_comments) / total_posts) * 100) : 0;
 
     res.json({
