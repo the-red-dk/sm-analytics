@@ -7,17 +7,27 @@ const router = express.Router();
 
 router.post('/register', async (req, res, next) => {
   try {
-    const { username, email, password, full_name } = req.body;
+    const { username, email, password, full_name, bio } = req.body;
     if (!username || !email || !password) return res.status(400).json({ message: 'Missing fields' });
     const pool = getPool();
     const [existing] = await pool.query('SELECT id FROM users WHERE username=? OR email=?', [username, email]);
     if (existing.length) return res.status(409).json({ message: 'User already exists' });
     const hash = await bcrypt.hash(password, 10);
     const [result] = await pool.query(
-      'INSERT INTO users (username, email, password_hash, full_name) VALUES (?, ?, ?, ?)',
-      [username, email, hash, full_name || null]
+      'INSERT INTO users (username, email, password_hash, full_name, bio) VALUES (?, ?, ?, ?, ?)',
+      [username, email, hash, full_name || null, bio || null]
     );
-    res.status(201).json({ id: result.insertId, username, email });
+    
+    // Return complete user data
+    const [newUser] = await pool.query(
+      'SELECT id, username, email, full_name, bio, created_at FROM users WHERE id = ?',
+      [result.insertId]
+    );
+    
+    res.status(201).json({ 
+      message: 'User created successfully',
+      user: newUser[0]
+    });
   } catch (e) {
     next(e);
   }

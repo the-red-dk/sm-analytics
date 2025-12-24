@@ -6,7 +6,7 @@ const { paginateParams } = require('../utils/helpers');
 
 const router = express.Router();
 
-router.get('/', auth(), async (req, res, next) => {
+router.get('/', auth(false), async (req, res, next) => {
   try {
     const pool = getPool();
     const { pageSize, offset } = paginateParams(req.query);
@@ -73,7 +73,7 @@ router.post('/', auth(), async (req, res, next) => {
   }
 });
 
-router.get('/:id', auth(), async (req, res, next) => {
+router.get('/:id', auth(false), async (req, res, next) => {
   try {
     const pool = getPool();
     const [rows] = await pool.query(

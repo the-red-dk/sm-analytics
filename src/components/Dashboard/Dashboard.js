@@ -11,6 +11,7 @@ import ActivityFeed from '../Widgets/ActivityFeed/ActivityFeed';
 const Dashboard = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [dataSource, setDataSource] = useState(null); // Track data source
 
   useEffect(() => {
     const load = async () => {
@@ -66,9 +67,13 @@ const Dashboard = () => {
           userGrowth: userGrowthData,
           recentActivities: mockData.recentActivities, // keep mock for now
         });
+        setDataSource('database');
+        console.log('✅ Successfully loaded data from database');
       } catch (err) {
-        console.warn('Falling back to mockData due to API error:', err.message);
+        console.error('❌ API Error - falling back to mockData:', err);
+        console.error('Error details:', err.message);
         setData(mockData);
+        setDataSource('mock');
       } finally {
         setLoading(false);
       }
@@ -90,6 +95,21 @@ const Dashboard = () => {
       <div className="dashboard-header">
         <h2>Analytics Dashboard</h2>
         <p>Overview of your social media performance</p>
+        {dataSource && (
+          <div style={{ 
+            padding: '8px 12px', 
+            marginTop: '8px',
+            borderRadius: '4px', 
+            background: dataSource === 'database' ? '#d4edda' : '#fff3cd',
+            color: dataSource === 'database' ? '#155724' : '#856404',
+            border: `1px solid ${dataSource === 'database' ? '#c3e6cb' : '#ffeeba'}`,
+            fontSize: '14px'
+          }}>
+            {dataSource === 'database' 
+              ? '✅ Connected to Database - Showing Real Data' 
+              : '⚠️ Using Mock Data - Check Console for API Errors'}
+          </div>
+        )}
       </div>
 
       <div className="dashboard-grid">

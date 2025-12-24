@@ -22,9 +22,11 @@ const UserManagement = () => {
       const usersData = await UsersApi.getAllUsers();
       setUsers(usersData);
       setError('');
+      console.log('✅ Successfully loaded users from database:', usersData.length, 'users');
     } catch (err) {
-      setError('Failed to load users');
-      console.error('Error loading users:', err);
+      const errorMsg = 'Failed to load users: ' + err.message;
+      setError(errorMsg);
+      console.error('❌ Error loading users:', err);
       // Fallback to mock data if API fails
       const mockUsers = [
         {

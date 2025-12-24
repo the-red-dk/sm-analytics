@@ -9,7 +9,7 @@ const path = require('path');
  * 1. Connect to MySQL server
  * 2. Create the sm_analytics database
  * 3. Create all tables with proper schema
- * 4. Apply schema updates
+ * 4. Apply schema updates (including followee_id -> following_id change)
  * 5. Insert sample data
  * 
  * Usage: node seed.js

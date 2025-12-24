@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './UserModal.css';
-import { UsersApi } from '../../api';
+import { UsersApi, AuthApi } from '../../api';
 
 const UserModal = ({ isOpen, onClose, user, onUserSaved }) => {
   const [formData, setFormData] = useState({
@@ -10,7 +10,8 @@ const UserModal = ({ isOpen, onClose, user, onUserSaved }) => {
     bio: user?.bio || '',
     location: user?.location || '',
     website: user?.website || '',
-    avatar_url: user?.avatar_url || ''
+    avatar_url: user?.avatar_url || '',
+    password: '' // Add password field for new users
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -30,21 +31,28 @@ const UserModal = ({ isOpen, onClose, user, onUserSaved }) => {
     try {
       let savedUser;
       if (user?.id) {
-        // Update existing user
+        // Update existing user - requires authentication
         savedUser = await UsersApi.updateUser(user.id, formData);
       } else {
-        // Create new user (requires password)
+        // Create new user using public registration endpoint
+        const password = formData.password || 'password123'; // Use provided password or default
         const userData = {
-          ...formData,
-          password: 'password123' // Default password for admin-created users
+          username: formData.username,
+          email: formData.email,
+          password: password,
+          full_name: formData.full_name,
+          bio: formData.bio
         };
-        savedUser = await UsersApi.createUser(userData);
+        const response = await AuthApi.register(userData);
+        savedUser = response.user || response;
       }
       
       onUserSaved(savedUser);
       onClose();
     } catch (err) {
-      setError(err.message || 'Failed to save user');
+      const errorMessage = err.message || 'Failed to save user';
+      setError(errorMessage);
+      console.error('Error saving user:', errorMessage);
     } finally {
       setLoading(false);
     }
@@ -130,6 +138,22 @@ const UserModal = ({ isOpen, onClose, user, onUserSaved }) => {
             </div>
           </div>
 
+          {!user?.id && (
+            <div className="form-group">
+              <label>Password</label>
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                placeholder="Leave blank for default: password123"
+              />
+              <small style={{ color: '#666', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                Default password is "password123" if left blank
+              </small>
+            </div>
+          )}
+
           <div className="form-group">
             <label>Avatar URL</label>
             <input
@@ -140,13 +164,6 @@ const UserModal = ({ isOpen, onClose, user, onUserSaved }) => {
               placeholder="https://example.com/avatar.jpg"
             />
           </div>
-
-          {!user?.id && (
-            <div className="password-note">
-              <p><strong>Note:</strong> New users will be created with default password: <code>password123</code></p>
-              <p>They can change it after first login.</p>
-            </div>
-          )}
 
           <div className="form-actions">
             <button type="button" className="cancel-btn" onClick={onClose}>

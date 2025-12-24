@@ -12,6 +12,27 @@ async function http(path, options = {}) {
   });
   if (!res.ok) {
     const text = await res.text().catch(() => '');
+    
+    // If we get "Invalid token", clear it and don't retry with auth
+    if (res.status === 401 && text.includes('Invalid token')) {
+      console.warn('⚠️ Invalid token detected, clearing from localStorage');
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('currentUser');
+      
+      // Show user-friendly message
+      if (typeof window !== 'undefined' && window.alert) {
+        setTimeout(() => {
+          console.log('Your session has expired. You can continue browsing without authentication.');
+        }, 100);
+      }
+      
+      // Retry the request without the token
+      if (token) {
+        console.log('🔄 Retrying request without authentication...');
+        return http(path, options);
+      }
+    }
+    
     throw new Error(text || res.statusText);
   }
   return res.json();
